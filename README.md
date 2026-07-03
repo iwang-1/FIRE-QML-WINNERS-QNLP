@@ -129,8 +129,8 @@
   https://jair.org/index.php/jair/article/view/14329/26923</li>
     <li>Khatri, N., & Hall, L. (n.d.). Experimental Comparison of Ansätze for Quantum Natural Language Processing.
   https://www.cs.ox.ac.uk/people/aleks.kissinger/theses/khatri-thesis.pdf</li>
-    <li>SPSA (v0.39) | IBM Quantum Documentation. (2017). IBM Quantum Documentation.
-  https://docs.quantum.ibm.com/api/qiskit/0.39/qiskit.algorithms.optimizers.SPSA</li>
+    <li>SPSA | Qiskit Algorithms Documentation.
+  https://qiskit-community.github.io/qiskit-algorithms/stubs/qiskit_algorithms.optimizers.SPSA.html</li>
     <li>Spall, J. C. (2000). Adaptive stochastic approximation by the simultaneous perturbation method. Proceedings of the
   37th IEEE Conference on Decision and Control (Cat. No.98CH36171), 4, 3872–3879.
   https://doi.org/10.1109/cdc.1998.761833</li>
