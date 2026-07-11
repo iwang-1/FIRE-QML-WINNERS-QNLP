@@ -106,6 +106,16 @@ The notebooks load the dataset splits from `datasets/` via relative paths, build
 - **Error analysis** — detailed analysis of model errors to find limitations and improvements.
 - **Hybrid models** — combining classical and quantum models for more robust, practical QNLP.
 
+## Team
+
+Built by a three-person team in UMD's FIRE (First-year Innovation & Research Experience) program:
+
+- **Evren Yucekus-Kissane**
+- **Anish Dhanrajani**
+- **Ivan Wang** ([@iwang-1](https://github.com/iwang-1)) — dataset preparation and integration, project documentation
+
+See the commit history for the full contribution breakdown.
+
 ## Attribution & License
 
 This project builds on the companion resources released with Lorenz et al., *QNLP in Practice* [1]: [Quantinuum/qnlp_lorenz_etal_2021_resources](https://github.com/Quantinuum/qnlp_lorenz_etal_2021_resources) (GPL-3.0). The dataset files are unmodified copies from that release, and the notebook pipeline (parsing, circuit encoding, and training loop) is derived from its reference implementation. The team's additions are the Sim14.1/Sim15.1 ansatz variants, the three alternative optimizers (Enhanced SPSA, Adam, and a genetic algorithm), and the comparative evaluation across ansatz–optimizer combinations.
