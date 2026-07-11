@@ -1,0 +1,9 @@
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Python bytecode
+__pycache__/
+
+# Result artifacts written by the notebooks when re-run
+*.pickle
+code/*.png
