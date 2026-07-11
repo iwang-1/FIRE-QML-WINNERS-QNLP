@@ -1,6 +1,6 @@
 # Quantum Natural Language Processing (QNLP): Sentence Classification with Quantum Circuits
 
-A UMD FIRE quantum machine learning research project exploring **quantum natural language processing** for sentence classification. Sentences are parsed into pregroup-grammar diagrams, compiled to parameterized quantum circuits, and trained to classify a 130-sentence food-vs-IT dataset — with two novel ansätze and three enhanced optimizers that beat standard SPSA by **~20% training accuracy** and **~30% test accuracy**.
+A UMD FIRE quantum machine learning research project exploring **quantum natural language processing** for sentence classification. Sentences are parsed into pregroup-grammar diagrams, compiled to parameterized quantum circuits, and trained to classify the 130-sentence food-vs-IT MC dataset. Building on Quantinuum's companion code for *QNLP in Practice* [1], the project adds two novel ansätze and three enhanced optimizers that beat standard SPSA by **~20% training accuracy** and **~30% test accuracy**.
 
 **Tech:** Python · Jupyter · [DisCoPy](https://discopy.org/) · [Qiskit](https://www.ibm.com/quantum/qiskit) · [pytket](https://docs.quantinuum.com/tket/)
 
@@ -54,7 +54,7 @@ To improve on standard SPSA we introduce three variants, each converging faster:
 
 ## Dataset
 
-An English, 130-sentence dataset for binary classification (food vs. IT), split into train / dev / test. Sentences follow the grammatical structures `N_TV_N`, `N_TV_ADJ_N`, `ADJ_N_TV_N`, and `ADJ_N_TV_ADJ_N`.
+The MC ("meaning classification") dataset: 130 English sentences for binary classification (food vs. IT), split into 70 train / 30 dev / 30 test. The dataset was released with Lorenz et al., *QNLP in Practice* [1] ([Quantinuum/qnlp_lorenz_etal_2021_resources](https://github.com/Quantinuum/qnlp_lorenz_etal_2021_resources), GPL-3.0); the files in `datasets/` are unmodified copies from that release. Sentences follow the grammatical structures `N_TV_N`, `N_TV_ADJ_N`, `ADJ_N_TV_N`, and `ADJ_N_TV_ADJ_N`.
 
 Preprocessing: tokenization → POS tagging → pregroup-grammar conversion → diagram transformation.
 
@@ -90,9 +90,15 @@ The notebooks are self-contained: they load the datasets from `datasets/`, build
 - **Error analysis** — detailed analysis of model errors to find limitations and improvements.
 - **Hybrid models** — combining classical and quantum models for more robust, practical QNLP.
 
+## Attribution & License
+
+This project builds on the companion resources released with Lorenz et al., *QNLP in Practice* [1]: [Quantinuum/qnlp_lorenz_etal_2021_resources](https://github.com/Quantinuum/qnlp_lorenz_etal_2021_resources) (GPL-3.0). The dataset files are unmodified copies from that release, and the notebook pipeline (parsing, circuit encoding, and training loop) is derived from its reference implementation. The team's additions are the Sim14.1/Sim15.1 ansatz variants, the three alternative optimizers (Enhanced SPSA, Adam, and a genetic algorithm), and the comparative evaluation across ansatz–optimizer combinations.
+
+Because this repository redistributes and derives from GPL-3.0 material, the derived content is subject to the terms of the [GNU GPL v3.0](https://www.gnu.org/licenses/gpl-3.0.html).
+
 ## References
 
-1. [QNLP in Practice: Running Compositional Models of Meaning on a Quantum Computer](https://jair.org/index.php/jair/article/view/14329/26923) (JAIR, 2024)
+1. Lorenz, R., Pearson, A., Meichanetzidis, K., Kartsaklis, D., & Coecke, B. (2023). [QNLP in Practice: Running Compositional Models of Meaning on a Quantum Computer](https://jair.org/index.php/jair/article/view/14329/26923). *Journal of Artificial Intelligence Research*. Companion code and data: [Quantinuum/qnlp_lorenz_etal_2021_resources](https://github.com/Quantinuum/qnlp_lorenz_etal_2021_resources).
 2. Khatri, N. — [Experimental Comparison of Ansätze for Quantum Natural Language Processing](https://www.cs.ox.ac.uk/people/aleks.kissinger/theses/khatri-thesis.pdf)
 3. [SPSA — Qiskit Algorithms documentation](https://qiskit-community.github.io/qiskit-algorithms/stubs/qiskit_algorithms.optimizers.SPSA.html)
 4. Spall, J. C. (2000). [Adaptive stochastic approximation by the simultaneous perturbation method](https://doi.org/10.1109/cdc.1998.761833). *Proceedings of the 37th IEEE Conference on Decision and Control.*
