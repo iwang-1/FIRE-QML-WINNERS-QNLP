@@ -86,12 +86,17 @@ These numbers come from exact noiseless simulation — even shot noise is absent
 
 ## Getting Started
 
+No re-run is needed to review the experiments — all outputs (training logs, diagrams, and result plots) are preserved in the committed notebooks.
+
+To re-run them, note that the notebooks pin their dependencies in their first cells: a 2021-era stack (`discopy==0.3.5`, `qiskit==0.25.4`, `pytket`, `pytket-qiskit`, `qiskit_ionq`, `pylatexenc`, plus `jax` for the simulation notebook). `qiskit` 0.25.4 requires Python 3.9 or earlier, and modern `discopy` 1.x has an incompatible API, so use a Python 3.9 environment:
+
 ```bash
-pip install discopy qiskit pytket jupyter
-jupyter notebook code/mc_task.ipynb
+# in a Python 3.9 environment
+pip install jupyter
+jupyter notebook code/mc_task.ipynb   # the first cell installs the pinned dependencies
 ```
 
-The notebooks are self-contained: they load the datasets from `datasets/`, build the pregroup-grammar circuits, and run training/evaluation for each ansatz–optimizer combination.
+The notebooks load the dataset splits from `datasets/` via relative paths, build the pregroup-grammar circuits, and run training/evaluation for each ansatz–optimizer combination.
 
 ## Future Work
 
