@@ -1,6 +1,6 @@
 # Quantum Natural Language Processing (QNLP): Sentence Classification with Quantum Circuits
 
-A UMD FIRE quantum machine learning research project exploring **quantum natural language processing** for sentence classification. Sentences are parsed into pregroup-grammar diagrams, compiled to parameterized quantum circuits, and trained to classify the 130-sentence food-vs-IT MC dataset. Building on Quantinuum's companion code for *QNLP in Practice* [1], the project evaluates two additional ansätze adapted from Sim et al.'s circuit catalogue [2] and three enhanced optimizers; the optimizers beat standard SPSA (a common gradient-free optimizer) by **~20 percentage points** of training accuracy and **~30 percentage points** of test accuracy.
+A UMD FIRE quantum machine learning research project exploring **quantum natural language processing** for sentence classification. Sentences are parsed into pregroup-grammar diagrams, compiled to parameterized quantum circuits, and trained to classify the 130-sentence food-vs-IT MC dataset. Building on Quantinuum's companion code for *QNLP in Practice* [1], the project implements two additional ansätze adapted from Sim et al.'s circuit catalogue [2] and evaluates three enhanced optimizers; the optimizers beat an out-of-the-box standard-SPSA baseline (a common gradient-free optimizer, run here with its default gains) by **roughly 30 percentage points** of training and test accuracy.
 
 **Tech:** Python · Jupyter · [DisCoPy](https://discopy.org/) · [Qiskit](https://www.ibm.com/quantum/qiskit) · [pytket](https://docs.quantinuum.com/tket/)
 
@@ -10,7 +10,7 @@ A UMD FIRE quantum machine learning research project exploring **quantum natural
 ├── assets/                        # Images for this README, exported from saved notebook outputs
 ├── code/
 │   ├── mc_task.ipynb              # Full pipeline: shot-based simulation (Qiskit AerBackend) and IonQ QPU integration
-│   └── mc_task_simulation.ipynb   # Exact classical simulation (DisCoPy + JAX): the ansatz/optimizer comparison behind the headline results
+│   └── mc_task_simulation.ipynb   # Exact classical simulation (DisCoPy + JAX): the optimizer comparison behind the headline results
 └── datasets/
     ├── mc_train_data.txt          # Training split (70 sentences)
     ├── mc_dev_data.txt            # Development split (30 sentences)
@@ -42,21 +42,21 @@ Traditional NLP struggles with ambiguous grammatical structures and long-range d
 
 ### Additional ansätze
 
-In addition to the standard IQP ansatz, we evaluated two ansätze adapted from the circuit catalogue of Sim, Johnson & Aspuru-Guzik (2019) [2] — circuits 14 and 15, following lambeq's [`Sim14Ansatz`/`Sim15Ansatz`](https://github.com/CQCL/lambeq) implementations. Both perform on par with IQP (see Results):
+In addition to the standard IQP ansatz, we implemented two ansätze adapted from the circuit catalogue of Sim, Johnson & Aspuru-Guzik (2019) [2] — circuits 14 and 15, following lambeq's [`Sim14Ansatz`/`Sim15Ansatz`](https://github.com/CQCL/lambeq) implementations (see Khatri's thesis [3] for a systematic comparison of such ansätze on QNLP tasks):
 
 | Ansatz | Design |
 |---|---|
 | **Sim14.1** | Each layer has two sublayers of *n* Ry rotations followed by a ring of *n* parameterized controlled-Rx (CRx) gates, with the ring orientation reversed in the second sublayer. |
 | **Sim15.1** | Same layout as Sim14.1, with the parameterized CRx rings replaced by CNOT rings. |
 
-The ansatz comparison lives in `mc_task_simulation.ipynb`; `mc_task.ipynb` uses the IQP ansatz.
+Both circuit definitions live in `mc_task_simulation.ipynb`. Honest caveat: in the committed configuration (1 qubit per grammatical type), multi-qubit words use the IQP ansatz and single-qubit nouns use the ansätze's shared single-qubit form (Rx·Rz·Rx), so the multi-qubit Sim14.1/Sim15.1 circuits above are implemented but not exercised by the committed runs, and no per-ansatz comparison results are preserved in this repository. `mc_task.ipynb` uses the IQP ansatz throughout.
 
 ### Enhanced optimizers
 
-To improve on standard SPSA (simultaneous perturbation stochastic approximation — a standard gradient-free optimizer [4][5]), we introduce three variants, each converging faster:
+To improve on standard SPSA (simultaneous perturbation stochastic approximation — a standard gradient-free optimizer [4][5]), we introduce three alternatives, each converging faster:
 
-- **Enhanced SPSA** — learning rates that adapt over iterations
-- **ADAM** — an ADAM optimizer variant
+- **Enhanced SPSA** — SPSA with its gain constants calibrated by Spall's heuristic [5], the gradient estimate divided by the actual perturbation (2·c_k·Δ), and early stopping on cost convergence
+- **ADAM** — a finite-difference ADAM optimizer [6] with early stopping
 - **Genetic algorithm** — population-based parameter search
 
 ## Dataset
@@ -67,28 +67,31 @@ Preprocessing: tokenization → POS tagging → pregroup-grammar conversion → 
 
 ## Results
 
-The headline results come from `mc_task_simulation.ipynb` — exact (noiseless) classical simulation of the circuits via DisCoPy's `Circuit.eval()`, JIT-compiled with **JAX** — averaged over **20 runs of 2,000 iterations** each. (`mc_task.ipynb` runs the same pipeline with shot-based simulation on Qiskit's **AerBackend** and includes IonQ QPU integration; it is committed with small demo run counts.)
+The headline results come from `mc_task_simulation.ipynb` — exact (noiseless) classical simulation of the circuits via DisCoPy's `Circuit.eval()`, JIT-compiled with **JAX** — averaged over **20 runs capped at 2,000 iterations** each. Enhanced SPSA and ADAM stop early once the cost converges, so their curves are nan-mean averages over the runs still active at each iteration. (`mc_task.ipynb` runs the same pipeline with shot-based simulation on Qiskit's **AerBackend** and includes IonQ QPU integration; it is committed with small demo run counts.)
 
-- Sim14.1 and Sim15.1 performed **on par with the standard IQP ansatz**.
-- Enhanced SPSA, ADAM, and the genetic algorithm all **converged faster than standard SPSA**.
-- Across all three ansätze, the enhanced optimizers outperformed standard SPSA on both training and test accuracy:
+All results use the IQP-ansatz configuration described in Method. One calibration caveat: the standard-SPSA baseline runs with the optimizer's default gains (`a = c = 1.0`), while Enhanced SPSA receives gains calibrated by Spall's heuristic — so part of the measured gap reflects hyperparameter calibration rather than the algorithm changes alone.
 
-| Metric | Improvement over standard SPSA |
+- Enhanced SPSA, ADAM, and the genetic algorithm all **converged faster than the standard-SPSA baseline**.
+- The enhanced optimizers outperformed the standard-SPSA baseline on both training and test accuracy:
+
+| Metric | Improvement over the standard-SPSA baseline |
 |---|---|
-| Training accuracy | **~20 percentage points higher** |
-| Test accuracy | **~30 percentage points higher** |
+| Training accuracy | **~27–31 percentage points higher** |
+| Test accuracy | **~32–37 percentage points higher** |
 
-![Optimizer comparison: cost and train/dev/test error over 2,000 iterations, averaged over 20 runs](assets/optimizer_comparison.png)
+(Computed from the mean final train/test error of each optimizer's 20 runs: standard SPSA 34%/41%, Enhanced SPSA 3%/4%, ADAM 7%/9%, genetic algorithm 6%/9%.)
 
-*From `mc_task_simulation.ipynb` (20 runs × 2,000 iterations): standard SPSA (black) plateaus around 25% train / 37% test error, while Enhanced SPSA, Adam, and the genetic algorithm drive errors down to roughly 0–10%.*
+![Optimizer comparison: cost and train/dev/test error, averaged over 20 runs capped at 2,000 iterations](assets/optimizer_comparison.png)
+
+*From `mc_task_simulation.ipynb`: standard SPSA (black) still hovers around 34% train / 41% test error after 2,000 iterations, while Enhanced SPSA, Adam, and the genetic algorithm bring mean final errors down to roughly 3–9%. Late stretches of the Enhanced SPSA and Adam curves average only the runs still active at that iteration.*
 
 These numbers come from exact noiseless simulation — even shot noise is absent — so performance on real QPUs will differ due to noise and other hardware effects.
 
 ## Getting Started
 
-No re-run is needed to review the experiments — all outputs (training logs, diagrams, and result plots) are preserved in the committed notebooks.
+No re-run is needed to review the experiments: both committed notebooks were executed top-to-bottom on Python 3.9 with the pinned dependencies from their first cells, so all training logs, diagrams, and result plots are preserved. The one exception is the final "IonQ QPU Code" section of `mc_task.ipynb`, which needs an IonQ API key and is left unexecuted.
 
-To re-run them, note that the notebooks pin their dependencies in their first cells: a 2021-era stack (`discopy==0.3.5`, `qiskit==0.25.4`, `pytket`, `pytket-qiskit`, `qiskit_ionq`, `pylatexenc`, plus `jax` for the simulation notebook). `qiskit` 0.25.4 requires Python 3.9 or earlier, and modern `discopy` 1.x has an incompatible API, so use a Python 3.9 environment:
+To re-run the notebooks, use a Python 3.9 environment — the pinned 2021-era stack (`discopy==0.3.5`, `qiskit==0.27.0`, `pytket==0.11.0`, `pytket-qiskit==0.14.1`, `qiskit_ionq==0.1.4`, plus `jax==0.4.30` for the simulation notebook) predates Python 3.10 (qiskit 0.27 and pytket 0.11 ship wheels only up to 3.9), and modern `discopy` 1.x has an incompatible API:
 
 ```bash
 # in a Python 3.9 environment
@@ -96,7 +99,7 @@ pip install jupyter
 jupyter notebook code/mc_task.ipynb   # the first cell installs the pinned dependencies
 ```
 
-The notebooks load the dataset splits from `datasets/` via relative paths, build the pregroup-grammar circuits, and run training/evaluation for each ansatz–optimizer combination.
+The notebooks load the dataset splits from `datasets/` via relative paths, build the pregroup-grammar circuits, and train them against each optimizer: `mc_task.ipynb` at its small demo settings (`n_runs = 2`, `niter = 2`), and `mc_task_simulation.ipynb` with the full 20-runs-of-2,000-iterations experiment behind the Results section (roughly 30–60 minutes of CPU time, depending on hardware).
 
 ## Future Work
 
@@ -108,7 +111,7 @@ The notebooks load the dataset splits from `datasets/` via relative paths, build
 
 ## Team
 
-Built by a three-person team in UMD's FIRE (First-year Innovation & Research Experience) program:
+Built by a three-person team in UMD's FIRE (First-year Innovation & Research Experience) program. The repository name combines the program (FIRE), its quantum machine learning stream (QML), and the team's name within the stream (WINNERS).
 
 - **Evren Yucekus-Kissane**
 - **Anish Dhanrajani**
@@ -118,7 +121,7 @@ See the commit history for the full contribution breakdown.
 
 ## Attribution & License
 
-This project builds on the companion resources released with Lorenz et al., *QNLP in Practice* [1]: [Quantinuum/qnlp_lorenz_etal_2021_resources](https://github.com/Quantinuum/qnlp_lorenz_etal_2021_resources) (GPL-3.0). The dataset files are unmodified copies from that release, and the notebook pipeline (parsing, circuit encoding, and training loop) is derived from its reference implementation. The team's additions are the Sim14.1/Sim15.1 ansatz variants, the three alternative optimizers (Enhanced SPSA, Adam, and a genetic algorithm), and the comparative evaluation across ansatz–optimizer combinations.
+This project builds on the companion resources released with Lorenz et al., *QNLP in Practice* [1]: [Quantinuum/qnlp_lorenz_etal_2021_resources](https://github.com/Quantinuum/qnlp_lorenz_etal_2021_resources) (GPL-3.0). The dataset files are unmodified copies from that release, and the notebook pipeline (parsing, circuit encoding, and training loop) is derived from its reference implementation. The team's additions are the Sim14.1/Sim15.1 ansatz implementations, the three alternative optimizers (Enhanced SPSA, Adam, and a genetic algorithm), and the comparative evaluation of the optimizers.
 
 Because this repository redistributes and derives from GPL-3.0 material, the derived content is subject to the terms of the [GNU GPL v3.0](https://www.gnu.org/licenses/gpl-3.0.html).
 
