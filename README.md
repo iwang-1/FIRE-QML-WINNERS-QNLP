@@ -1,12 +1,13 @@
 # Quantum Natural Language Processing (QNLP): Sentence Classification with Quantum Circuits
 
-A UMD FIRE quantum machine learning research project exploring **quantum natural language processing** for sentence classification. Sentences are parsed into pregroup-grammar diagrams, compiled to parameterized quantum circuits, and trained to classify the 130-sentence food-vs-IT MC dataset. Building on Quantinuum's companion code for *QNLP in Practice* [1], the project evaluates two additional ansätze adapted from Sim et al.'s circuit catalogue [2] and three enhanced optimizers that beat standard SPSA by **~20% training accuracy** and **~30% test accuracy**.
+A UMD FIRE quantum machine learning research project exploring **quantum natural language processing** for sentence classification. Sentences are parsed into pregroup-grammar diagrams, compiled to parameterized quantum circuits, and trained to classify the 130-sentence food-vs-IT MC dataset. Building on Quantinuum's companion code for *QNLP in Practice* [1], the project evaluates two additional ansätze adapted from Sim et al.'s circuit catalogue [2] and three enhanced optimizers; the optimizers beat standard SPSA (a common gradient-free optimizer) by **~20 percentage points** of training accuracy and **~30 percentage points** of test accuracy.
 
 **Tech:** Python · Jupyter · [DisCoPy](https://discopy.org/) · [Qiskit](https://www.ibm.com/quantum/qiskit) · [pytket](https://docs.quantinuum.com/tket/)
 
 ## Repository Structure
 
 ```
+├── assets/                        # Images for this README, exported from saved notebook outputs
 ├── code/
 │   ├── mc_task.ipynb              # Full pipeline: shot-based simulation (Qiskit AerBackend) and IonQ QPU integration
 │   └── mc_task_simulation.ipynb   # Exact classical simulation (DisCoPy + JAX): the ansatz/optimizer comparison behind the headline results
@@ -35,6 +36,10 @@ Traditional NLP struggles with ambiguous grammatical structures and long-range d
 3. **Quantum encoding** — DisCoPy's `CircuitFunctor` maps the transformed diagrams to quantum circuits; each word is encoded as a parameterized circuit (IQP ansatz baseline) with learnable parameters.
 4. **Measurement & classification** — measuring the final quantum state yields a probability distribution used for binary classification, trained against cross-entropy loss.
 
+![Pregroup-grammar diagram for the sentence "skillful man prepares sauce"](assets/pregroup_diagram.png)
+
+*Pregroup-grammar diagram for "skillful man prepares sauce" (drawn in `mc_task.ipynb`): cups contract matching noun types, leaving an open sentence wire `S` that becomes the circuit's output.*
+
 ### Additional ansätze
 
 In addition to the standard IQP ansatz, we evaluated two ansätze adapted from the circuit catalogue of Sim, Johnson & Aspuru-Guzik (2019) [2] — circuits 14 and 15, following lambeq's [`Sim14Ansatz`/`Sim15Ansatz`](https://github.com/CQCL/lambeq) implementations. Both perform on par with IQP (see Results):
@@ -48,7 +53,7 @@ The ansatz comparison lives in `mc_task_simulation.ipynb`; `mc_task.ipynb` uses 
 
 ### Enhanced optimizers
 
-To improve on standard SPSA we introduce three variants, each converging faster:
+To improve on standard SPSA (simultaneous perturbation stochastic approximation — a standard gradient-free optimizer [4][5]), we introduce three variants, each converging faster:
 
 - **Enhanced SPSA** — learning rates that adapt over iterations
 - **ADAM** — an ADAM optimizer variant
@@ -70,8 +75,12 @@ The headline results come from `mc_task_simulation.ipynb` — exact (noiseless) 
 
 | Metric | Improvement over standard SPSA |
 |---|---|
-| Training accuracy | **~20% higher** |
-| Test accuracy | **~30% higher** |
+| Training accuracy | **~20 percentage points higher** |
+| Test accuracy | **~30 percentage points higher** |
+
+![Optimizer comparison: cost and train/dev/test error over 2,000 iterations, averaged over 20 runs](assets/optimizer_comparison.png)
+
+*From `mc_task_simulation.ipynb` (20 runs × 2,000 iterations): standard SPSA (black) plateaus around 25% train / 37% test error, while Enhanced SPSA, Adam, and the genetic algorithm drive errors down to roughly 0–10%.*
 
 These numbers come from exact noiseless simulation — even shot noise is absent — so performance on real QPUs will differ due to noise and other hardware effects.
 
