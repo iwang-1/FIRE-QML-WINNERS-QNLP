@@ -1,6 +1,6 @@
 # Quantum Natural Language Processing (QNLP): Sentence Classification with Quantum Circuits
 
-A UMD FIRE quantum machine learning research project exploring **quantum natural language processing** for sentence classification. Sentences are parsed into pregroup-grammar diagrams, compiled to parameterized quantum circuits, and trained to classify the 130-sentence food-vs-IT MC dataset. Building on Quantinuum's companion code for *QNLP in Practice* [1], the project adds two novel ansätze and three enhanced optimizers that beat standard SPSA by **~20% training accuracy** and **~30% test accuracy**.
+A UMD FIRE quantum machine learning research project exploring **quantum natural language processing** for sentence classification. Sentences are parsed into pregroup-grammar diagrams, compiled to parameterized quantum circuits, and trained to classify the 130-sentence food-vs-IT MC dataset. Building on Quantinuum's companion code for *QNLP in Practice* [1], the project evaluates two additional ansätze adapted from Sim et al.'s circuit catalogue [2] and three enhanced optimizers that beat standard SPSA by **~20% training accuracy** and **~30% test accuracy**.
 
 **Tech:** Python · Jupyter · [DisCoPy](https://discopy.org/) · [Qiskit](https://www.ibm.com/quantum/qiskit) · [pytket](https://docs.quantinuum.com/tket/)
 
@@ -8,12 +8,12 @@ A UMD FIRE quantum machine learning research project exploring **quantum natural
 
 ```
 ├── code/
-│   ├── mc_task.ipynb              # Main experiment notebook: model, ansätze, optimizers, evaluation
-│   └── mc_task_simulation.ipynb   # Simulation runs on the Qiskit AerBackend
+│   ├── mc_task.ipynb              # Full pipeline: shot-based simulation (Qiskit AerBackend) and IonQ QPU integration
+│   └── mc_task_simulation.ipynb   # Exact classical simulation (DisCoPy + JAX): the ansatz/optimizer comparison behind the headline results
 └── datasets/
-    ├── mc_train_data.txt          # Training split
-    ├── mc_dev_data.txt            # Development split
-    └── mc_test_data.txt           # Test split
+    ├── mc_train_data.txt          # Training split (70 sentences)
+    ├── mc_dev_data.txt            # Development split (30 sentences)
+    └── mc_test_data.txt           # Test split (30 sentences)
 ```
 
 ## Motivation
@@ -35,14 +35,16 @@ Traditional NLP struggles with ambiguous grammatical structures and long-range d
 3. **Quantum encoding** — DisCoPy's `CircuitFunctor` maps the transformed diagrams to quantum circuits; each word is encoded as a parameterized circuit (IQP ansatz baseline) with learnable parameters.
 4. **Measurement & classification** — measuring the final quantum state yields a probability distribution used for binary classification, trained against cross-entropy loss.
 
-### Novel ansätze
+### Additional ansätze
 
-In addition to the standard IQP ansatz, we propose two new ansätze that perform on par with it:
+In addition to the standard IQP ansatz, we evaluated two ansätze adapted from the circuit catalogue of Sim, Johnson & Aspuru-Guzik (2019) [2] — circuits 14 and 15, following lambeq's [`Sim14Ansatz`/`Sim15Ansatz`](https://github.com/CQCL/lambeq) implementations. Both perform on par with IQP (see Results):
 
 | Ansatz | Design |
 |---|---|
-| **Sim14.1** | Each layer has two sublayers of *n* RZ gates followed by *n* CNOT gates in a ring topology, with the CNOT ring reversed in the second sublayer. |
-| **Sim15.1** | Same layout as Sim14.1, but CNOT gates are replaced with CRZ gates plus an added layer of Hadamard gates, inspired by the IQP ansatz. |
+| **Sim14.1** | Each layer has two sublayers of *n* Ry rotations followed by a ring of *n* parameterized controlled-Rx (CRx) gates, with the ring orientation reversed in the second sublayer. |
+| **Sim15.1** | Same layout as Sim14.1, with the parameterized CRx rings replaced by CNOT rings. |
+
+The ansatz comparison lives in `mc_task_simulation.ipynb`; `mc_task.ipynb` uses the IQP ansatz.
 
 ### Enhanced optimizers
 
@@ -54,13 +56,13 @@ To improve on standard SPSA we introduce three variants, each converging faster:
 
 ## Dataset
 
-The MC ("meaning classification") dataset: 130 English sentences for binary classification (food vs. IT), split into 70 train / 30 dev / 30 test. The dataset was released with Lorenz et al., *QNLP in Practice* [1] ([Quantinuum/qnlp_lorenz_etal_2021_resources](https://github.com/Quantinuum/qnlp_lorenz_etal_2021_resources), GPL-3.0); the files in `datasets/` are unmodified copies from that release. Sentences follow the grammatical structures `N_TV_N`, `N_TV_ADJ_N`, `ADJ_N_TV_N`, and `ADJ_N_TV_ADJ_N`.
+The MC ("meaning classification") dataset: 130 English sentences for binary classification (food vs. IT), split into 70 train / 30 dev / 30 test. The dataset was released with Lorenz et al., *QNLP in Practice* [1] ([Quantinuum/qnlp_lorenz_etal_2021_resources](https://github.com/Quantinuum/qnlp_lorenz_etal_2021_resources), GPL-3.0); the files in `datasets/` are unmodified copies from that release. Sentences follow three grammatical structures: `N_TV_N` (47 sentences), `N_TV_ADJ_N` (44), and `ADJ_N_TV_N` (39).
 
 Preprocessing: tokenization → POS tagging → pregroup-grammar conversion → diagram transformation.
 
 ## Results
 
-Experiments ran on Qiskit's **AerBackend** simulator, averaged over **20 runs of 2,000 iterations** each.
+The headline results come from `mc_task_simulation.ipynb` — exact (noiseless) classical simulation of the circuits via DisCoPy's `Circuit.eval()`, JIT-compiled with **JAX** — averaged over **20 runs of 2,000 iterations** each. (`mc_task.ipynb` runs the same pipeline with shot-based simulation on Qiskit's **AerBackend** and includes IonQ QPU integration; it is committed with small demo run counts.)
 
 - Sim14.1 and Sim15.1 performed **on par with the standard IQP ansatz**.
 - Enhanced SPSA, ADAM, and the genetic algorithm all **converged faster than standard SPSA**.
@@ -71,7 +73,7 @@ Experiments ran on Qiskit's **AerBackend** simulator, averaged over **20 runs of
 | Training accuracy | **~20% higher** |
 | Test accuracy | **~30% higher** |
 
-Performance on real QPUs may vary due to noise and other quantum effects.
+These numbers come from exact noiseless simulation — even shot noise is absent — so performance on real QPUs will differ due to noise and other hardware effects.
 
 ## Getting Started
 
@@ -99,7 +101,8 @@ Because this repository redistributes and derives from GPL-3.0 material, the der
 ## References
 
 1. Lorenz, R., Pearson, A., Meichanetzidis, K., Kartsaklis, D., & Coecke, B. (2023). [QNLP in Practice: Running Compositional Models of Meaning on a Quantum Computer](https://jair.org/index.php/jair/article/view/14329/26923). *Journal of Artificial Intelligence Research*. Companion code and data: [Quantinuum/qnlp_lorenz_etal_2021_resources](https://github.com/Quantinuum/qnlp_lorenz_etal_2021_resources).
-2. Khatri, N. — [Experimental Comparison of Ansätze for Quantum Natural Language Processing](https://www.cs.ox.ac.uk/people/aleks.kissinger/theses/khatri-thesis.pdf)
-3. [SPSA — Qiskit Algorithms documentation](https://qiskit-community.github.io/qiskit-algorithms/stubs/qiskit_algorithms.optimizers.SPSA.html)
-4. Spall, J. C. (2000). [Adaptive stochastic approximation by the simultaneous perturbation method](https://doi.org/10.1109/cdc.1998.761833). *Proceedings of the 37th IEEE Conference on Decision and Control.*
-5. [qml.AdamOptimizer — PennyLane documentation](https://docs.pennylane.ai/en/stable/code/api/pennylane.AdamOptimizer.html)
+2. Sim, S., Johnson, P. D., & Aspuru-Guzik, A. (2019). [Expressibility and entangling capability of parameterized quantum circuits for hybrid quantum-classical algorithms](https://arxiv.org/abs/1905.10876). *Advanced Quantum Technologies*, 2(12).
+3. Khatri, N. — [Experimental Comparison of Ansätze for Quantum Natural Language Processing](https://www.cs.ox.ac.uk/people/aleks.kissinger/theses/khatri-thesis.pdf)
+4. [SPSA — Qiskit Algorithms documentation](https://qiskit-community.github.io/qiskit-algorithms/stubs/qiskit_algorithms.optimizers.SPSA.html)
+5. Spall, J. C. (2000). [Adaptive stochastic approximation by the simultaneous perturbation method](https://doi.org/10.1109/cdc.1998.761833). *Proceedings of the 37th IEEE Conference on Decision and Control.*
+6. [qml.AdamOptimizer — PennyLane documentation](https://docs.pennylane.ai/en/stable/code/api/pennylane.AdamOptimizer.html)
