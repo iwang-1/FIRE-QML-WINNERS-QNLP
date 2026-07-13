@@ -1,8 +1,22 @@
 # Quantum Natural Language Processing (QNLP): Sentence Classification with Quantum Circuits
 
-A UMD FIRE quantum machine learning research project exploring **quantum natural language processing** for sentence classification. Sentences are parsed into pregroup-grammar diagrams, compiled to parameterized quantum circuits, and trained to classify the 130-sentence food-vs-IT MC dataset. Building on Quantinuum's companion code for *QNLP in Practice* [1], the project implements two additional ansätze adapted from Sim et al.'s circuit catalogue [2] and evaluates three enhanced optimizers; the optimizers beat an out-of-the-box standard-SPSA baseline (a common gradient-free optimizer, run here with its default gains) by **roughly 30 percentage points** of training and test accuracy.
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-390/)
+[![View mc_task.ipynb](https://img.shields.io/badge/nbviewer-mc__task-orange)](https://nbviewer.org/github/iwang-1/FIRE-QML-WINNERS-QNLP/blob/main/code/mc_task.ipynb)
+[![View mc_task_simulation.ipynb](https://img.shields.io/badge/nbviewer-mc__task__simulation-orange)](https://nbviewer.org/github/iwang-1/FIRE-QML-WINNERS-QNLP/blob/main/code/mc_task_simulation.ipynb)
+
+A UMD FIRE quantum machine learning research project exploring **quantum natural language processing** for sentence classification. (The name decodes as FIRE — UMD's First-year Innovation & Research Experience program, QML — its quantum machine learning stream, and WINNERS — the team's name.) Sentences are parsed into pregroup-grammar diagrams, compiled to parameterized quantum circuits, and trained to classify the 130-sentence food-vs-IT MC dataset. Building on Quantinuum's companion code for *QNLP in Practice* [1], the project implements two additional ansätze adapted from Sim et al.'s circuit catalogue [2] and evaluates three enhanced optimizers. In the committed runs, the enhanced optimizers beat an out-of-the-box standard-SPSA baseline (a common gradient-free optimizer, run here with its default gains) by **roughly 30 percentage points** of training and test accuracy.
 
 **Tech:** Python · Jupyter · [DisCoPy](https://discopy.org/) · [Qiskit](https://www.ibm.com/quantum/qiskit) · [pytket](https://docs.quantinuum.com/tket/)
+
+**Headline result** — from `mc_task_simulation.ipynb`, exact noiseless simulation averaged over 20 runs capped at 2,000 iterations (full details and plot in [Results](#results)):
+
+| Metric | Improvement over the standard-SPSA baseline |
+|---|---|
+| Training accuracy | **~27–31 percentage points higher** |
+| Test accuracy | **~32–37 percentage points higher** |
+
+Calibration caveat: the standard-SPSA baseline runs with the optimizer's default gains (`a = c = 1.0`), while Enhanced SPSA receives gains calibrated by Spall's heuristic — so part of the measured gap reflects hyperparameter calibration rather than the algorithm changes alone.
 
 ## Repository Structure
 
@@ -21,9 +35,9 @@ A UMD FIRE quantum machine learning research project exploring **quantum natural
 
 Traditional NLP struggles with ambiguous grammatical structures and long-range dependencies. QNLP offers a potential advantage by leveraging quantum-mechanical principles — superposition and entanglement — to represent and process linguistic information:
 
-- **Encoding** — quantum states can represent high-dimensional feature spaces efficiently, potentially better capturing complex relationships in language.
-- **Parallelism** — quantum algorithms can explore multiple possibilities simultaneously, potentially speeding up training and inference.
-- **Expressibility** — quantum circuits can represent more complex functions than comparable classical networks, enabling the model to learn intricate linguistic patterns.
+- **Compositional structure** — pregroup grammar's tensor structure maps naturally onto quantum circuits: word meanings become quantum states and grammatical composition becomes entangling operations, so the model's architecture mirrors the sentence's grammar by construction [1].
+- **Encoding** — quantum states occupy a Hilbert space whose dimension grows exponentially with qubit count, offering a compact parameterization of high-dimensional feature spaces.
+- **Expressibility** — parameterized quantum circuits form expressive function families whose expressibility can be quantified and compared across circuit designs (Sim et al. [2]) — the basis for the ansatz choices in this project.
 
 **Objective:** build and evaluate a quantum ML model for binary sentence classification, investigating whether quantum circuits can usefully encode and process pregroup-grammar representations of sentences.
 
