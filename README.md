@@ -127,9 +127,9 @@ The notebooks load the dataset splits from `datasets/` via relative paths, build
 
 Built by a three-person team in UMD's FIRE (First-year Innovation & Research Experience) program. The repository name combines the program (FIRE), its quantum machine learning stream (QML), and the team's name within the stream (WINNERS).
 
-- **Evren Yucekus-Kissane**
-- **Anish Dhanrajani**
-- **Ivan Wang** ([@iwang-1](https://github.com/iwang-1)) — dataset preparation and integration, project documentation
+- **Evren Yucekus-Kissane** ([@EvrenKissane](https://github.com/EvrenKissane))
+- **Anish Dhanrajani** ([@anish-dhanrajani](https://github.com/anish-dhanrajani))
+- **Ivan Wang** ([@iwang-1](https://github.com/iwang-1)) — dataset integration and pipeline wiring, project documentation
 
 See the commit history for the full contribution breakdown.
 
