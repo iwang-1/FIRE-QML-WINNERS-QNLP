@@ -5,7 +5,7 @@
 [![View mc_task.ipynb](https://img.shields.io/badge/nbviewer-mc__task-orange)](https://nbviewer.org/github/iwang-1/FIRE-QML-WINNERS-QNLP/blob/main/code/mc_task.ipynb)
 [![View mc_task_simulation.ipynb](https://img.shields.io/badge/nbviewer-mc__task__simulation-orange)](https://nbviewer.org/github/iwang-1/FIRE-QML-WINNERS-QNLP/blob/main/code/mc_task_simulation.ipynb)
 
-A UMD FIRE quantum machine learning research project exploring **quantum natural language processing** for sentence classification. (The name decodes as FIRE — UMD's First-year Innovation & Research Experience program, QML — its quantum machine learning stream, and WINNERS — the team's name.) Sentences are parsed into pregroup-grammar diagrams, compiled to parameterized quantum circuits, and trained to classify the 130-sentence food-vs-IT MC dataset. Building on Quantinuum's companion code for *QNLP in Practice* [1], the project implements two additional ansätze adapted from Sim et al.'s circuit catalogue [2] and evaluates three enhanced optimizers. In the committed runs, the enhanced optimizers beat an out-of-the-box standard-SPSA baseline (a common gradient-free optimizer, run here with its default gains) by **roughly 30 percentage points** of training and test accuracy.
+A collaborative quantum machine learning research project exploring **quantum natural language processing** for sentence classification. Sentences are parsed into pregroup-grammar diagrams, compiled to parameterized quantum circuits, and trained to classify the 130-sentence food-vs-IT MC dataset. Building on Quantinuum's companion code for *QNLP in Practice* [1], the project implements two additional ansätze adapted from Sim et al.'s circuit catalogue [2] and evaluates three enhanced optimizers. In the committed runs, the enhanced optimizers beat an out-of-the-box standard-SPSA baseline (a common gradient-free optimizer, run here with its default gains) by **roughly 30 percentage points** of training and test accuracy.
 
 **Tech:** Python · Jupyter · [DisCoPy](https://discopy.org/) · [Qiskit](https://www.ibm.com/quantum/qiskit) · [pytket](https://docs.quantinuum.com/tket/)
 
@@ -125,7 +125,7 @@ The notebooks load the dataset splits from `datasets/` via relative paths, build
 
 ## Team
 
-Built by a three-person team in UMD's FIRE (First-year Innovation & Research Experience) program. The repository name combines the program (FIRE), its quantum machine learning stream (QML), and the team's name within the stream (WINNERS).
+Built by a three-person team.
 
 - **Evren Yucekus-Kissane** ([@EvrenKissane](https://github.com/EvrenKissane))
 - **Anish Dhanrajani** ([@anish-dhanrajani](https://github.com/anish-dhanrajani))
