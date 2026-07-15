@@ -125,7 +125,8 @@ The notebooks load the dataset splits from `datasets/` via relative paths, build
 
 ## Team
 
-Built by a three-person team.
+Completed by a four-person research team. Public repository contributors are
+listed below; one teammate participated outside this commit history.
 
 - **Evren Yucekus-Kissane** ([@EvrenKissane](https://github.com/EvrenKissane))
 - **Anish Dhanrajani** ([@anish-dhanrajani](https://github.com/anish-dhanrajani))
